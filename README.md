@@ -10,7 +10,7 @@ There is a compiled executable version for Windows (WarBotCompiled.zip) and the 
 * You will be prompted to specify the rate interval between turns (in seconds).
 * You can specify intervals of time in which the bot will update the war status.
 * You can specify a custom footer message for your bot (or leave it empty).
-* [DEVELOPING - NOT YET AVAILABLE] You can specify custom quotes and add new translations without changing the source code directly.
+* [DEVELOPING - NOT AVAILABLE YET] You can specify custom quotes and add new translations without changing the source code directly.
 
 ## Usage
 
