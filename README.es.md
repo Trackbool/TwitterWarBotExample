@@ -1,5 +1,5 @@
 # Twitter War Bot
-War bot multiplataforma para Twitter programado en Java, haciendo uso de la librería Twitter4j. Permite añdair intervalos de tiempo personalizados en los cuales el estado de la guerra podrá actualizarse.
+War bot multiplataforma para Twitter programado en Java, haciendo uso de la librería Twitter4j. Permite añadir intervalos de tiempo personalizados en los cuales el estado de la guerra podrá actualizarse.
 Hay una versión ejecutable compilada para Windows (WarBotCompiled.zip) y el JAR para todas las plataformas.
 
 ![alt text](https://i.gyazo.com/0c8e64ab50349dbbad52095b701072b6.png)
