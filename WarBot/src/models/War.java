@@ -1,9 +1,10 @@
 package models;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class War {
+public class War implements Serializable {
     private String name;
     private ArrayList<Player> players;
     private ArrayList<Player> currentPlayers;
@@ -24,6 +25,10 @@ public class War {
         this.currentPlayers = new ArrayList<>(players);
         deadPlayers = new ArrayList<>();
         currentDay = 1;
+    }
+
+    public List<Player> getAllPlayers(){
+        return players;
     }
 
     public String getName() {

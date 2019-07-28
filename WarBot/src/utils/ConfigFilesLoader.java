@@ -14,9 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ConfigFilesLoader {
-    private final static String GLOBAL_CONFIG_PATH = "files/config.txt";
-    private final static String PLAYERS_LIST_PATH = "files/players.txt";
-    private final static String TIME_INTERVALS_LIST_PATH = "files/time-intervals.txt";
+    public final static String GLOBAL_CONFIG_PATH = "files/config.txt";
+    public final static String PLAYERS_LIST_PATH = "files/players.txt";
+    public final static String TIME_INTERVALS_LIST_PATH = "files/time-intervals.txt";
 
     public static GlobalConfig loadGlobalConfig() throws IOException {
         List<String> lines;
@@ -30,11 +30,11 @@ public class ConfigFilesLoader {
                     elements = line.split("=", 2);
                     configModel.addProperty(elements[0], elements[1]);
                 } else if (!line.isEmpty()) {
-                    throw new IOException("Invalid config file format. Missing '='");
+                    throw new IOException("Invalid config file format. Missing '='.");
                 }
             }
         } catch (IndexOutOfBoundsException e) {
-            throw new IOException("Invalid config file format");
+            throw new IOException("Invalid config file format.");
         }
 
         return configModel;
@@ -52,7 +52,7 @@ public class ConfigFilesLoader {
                 players.add(new Player(elements[0].trim(), elements[1]));
             }
         } catch (IndexOutOfBoundsException e) {
-            throw new IOException("Invalid players file format");
+            throw new IOException("Invalid players file format.");
         }
 
         return players;
@@ -75,7 +75,7 @@ public class ConfigFilesLoader {
                 }
             }
         } catch (IndexOutOfBoundsException e) {
-            throw new IOException("Invalid time intervals file format");
+            throw new IOException("Invalid time intervals file format.");
         }
 
         return timeIntervals;

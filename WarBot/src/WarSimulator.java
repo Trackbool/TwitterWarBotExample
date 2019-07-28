@@ -12,22 +12,43 @@ import java.util.concurrent.TimeUnit;
 
 public class WarSimulator {
     private War war;
+    private Runnable onTurnPerformed;
+    private Runnable onFinish;
     private Notifier notifier;
+    private boolean newGame;
     private int rateSeconds;
     private List<TimeIntervalModel> timeIntervals;
 
-    public WarSimulator(String warName, List<Player> players) {
-        war = new War(warName, players);
+    public WarSimulator(War war) {
+        this.war = war;
         this.notifier = System.out::println;
+        this.newGame = true;
         this.rateSeconds = 0;
         this.timeIntervals = new ArrayList<>();
     }
 
-    public WarSimulator(String warName, List<Player> players, Notifier notifier) {
-        war = new War(warName, players);
-        this.notifier = notifier;
+    public WarSimulator(War war, boolean newGame) {
+        this.war = war;
+        this.notifier = System.out::println;
+        this.newGame = newGame;
         this.rateSeconds = 0;
         this.timeIntervals = new ArrayList<>();
+    }
+
+    public WarSimulator(War war, boolean newGame, Notifier notifier) {
+        this.war = war;
+        this.notifier = notifier;
+        this.newGame = newGame;
+        this.rateSeconds = 0;
+        this.timeIntervals = new ArrayList<>();
+    }
+
+    public void setOnTurnPerformed(Runnable onTurnPerformed) {
+        this.onTurnPerformed = onTurnPerformed;
+    }
+
+    public void setOnFinish(Runnable onFinish) {
+        this.onFinish = onFinish;
     }
 
     public void setNotifier(Notifier notifier) {
@@ -43,17 +64,22 @@ public class WarSimulator {
     }
 
     public void start() {
-        if (!thereIsMoreThanOnePlayer()) {
-            System.out.println("There are not enough players. Players: " + war.getAllPlayersCount());
+        if (thereIsOnlyOnePlayer()) {
+            System.out.println("There are not enough players. Players: " + war.getCurrentPlayersCount());
             return;
         }
 
         long rateMillis = TimeUnit.SECONDS.toMillis(rateSeconds);
-        TimerTaskExecutor executor = new TimerTaskExecutor(this::performStep, rateMillis, rateMillis, timeIntervals);
-        executor.setFinishCondition(() -> !thereIsMoreThanOnePlayer());
-        executor.setOnFinish(() -> notifier.notify(getWinMessage()));
+        long startDelayMillis = newGame ? rateMillis : 2;
 
-        notifier.notify(getBeginMessage());
+        TimerTaskExecutor executor = new TimerTaskExecutor(
+                this::performStep, startDelayMillis, rateMillis, timeIntervals);
+        executor.setOnFinish(this::onWin);
+        executor.setFinishCondition(this::thereIsOnlyOnePlayer);
+
+        if (newGame) {
+            notifier.notify(getBeginMessage());
+        }
         executor.start();
     }
 
@@ -63,8 +89,8 @@ public class WarSimulator {
                 "\n---------------------";
     }
 
-    private boolean thereIsMoreThanOnePlayer() {
-        return war.getCurrentPlayersCount() >= 2;
+    private boolean thereIsOnlyOnePlayer() {
+        return war.getCurrentPlayersCount() == 1;
     }
 
     private void performStep() {
@@ -77,6 +103,12 @@ public class WarSimulator {
         notifier.notify(message);
 
         war.incrementDay();
+        onTurnPerformed.run();
+    }
+
+    private void onWin() {
+        notifier.notify(getWinMessage());
+        onFinish.run();
     }
 
     private String getWinMessage() {
