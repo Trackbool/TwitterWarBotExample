@@ -1,0 +1,1 @@
+In this folder the save game file is automatically generated and stored.
