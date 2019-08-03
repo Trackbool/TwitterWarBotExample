@@ -14,7 +14,6 @@
 
 package utils.file;
 
-import javafx.util.Pair;
 import org.mozilla.intl.chardet.nsDetector;
 import org.mozilla.intl.chardet.nsICharsetDetectionObserver;
 import org.mozilla.intl.chardet.nsPSMDetector;
