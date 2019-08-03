@@ -22,31 +22,27 @@ public class WarSimulator {
     private WarQuotes warQuotes;
     private List<TimeIntervalModel> timeIntervals;
 
-    public WarSimulator(War war, WarQuotes warQuotes) {
+    public WarSimulator(War war){
         this.war = war;
         this.notifier = System.out::println;
         this.newGame = true;
         this.rateSeconds = 0;
-        this.warQuotes = warQuotes;
         this.timeIntervals = new ArrayList<>();
+    }
+
+    public WarSimulator(War war, WarQuotes warQuotes) {
+        this(war);
+        this.warQuotes = warQuotes;
     }
 
     public WarSimulator(War war, boolean newGame, WarQuotes warQuotes) {
-        this.war = war;
-        this.notifier = System.out::println;
+        this(war, warQuotes);
         this.newGame = newGame;
-        this.rateSeconds = 0;
-        this.warQuotes = warQuotes;
-        this.timeIntervals = new ArrayList<>();
     }
 
     public WarSimulator(War war, boolean newGame, WarQuotes warQuotes, Notifier notifier) {
-        this.war = war;
+        this(war, newGame, warQuotes);
         this.notifier = notifier;
-        this.newGame = newGame;
-        this.rateSeconds = 0;
-        this.warQuotes = warQuotes;
-        this.timeIntervals = new ArrayList<>();
     }
 
     public void setOnTurnPerformed(Runnable onTurnPerformed) {

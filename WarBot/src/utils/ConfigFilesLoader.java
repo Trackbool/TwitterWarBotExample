@@ -1,12 +1,13 @@
 package utils;
 
-import models.configuration.GlobalConfig;
 import models.Language;
+import models.configuration.GlobalConfig;
 import models.war.Player;
 import quotes.models.WarQuoteActions;
 import timer.models.TimeIntervalModel;
 import utils.file.FileUtils;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -21,13 +22,13 @@ public class ConfigFilesLoader {
     private final static String GLOBAL_CONFIG_FILE = "files/config.txt";
     private final static String PLAYERS_LIST_FILE = "files/players.txt";
     private final static String TIME_INTERVALS_LIST_FILE = "files/time-intervals.txt";
-    private final static String QUOTES_PATH = "files/translations/";
     private final static String LANGUAGE_PARAMETER = "{LANGUAGE}";
-    private final static String QUOTES_FILE = QUOTES_PATH + "quotes-" + LANGUAGE_PARAMETER + ".txt";
+    private final static String TRANSLATIONS_PATH = "files/translations/" + LANGUAGE_PARAMETER;
+    private final static String QUOTES_FILE = TRANSLATIONS_PATH + "/quotes.txt";
+    private final static String KILL_VERBS_FILE = TRANSLATIONS_PATH + "/kill-verbs.txt";
 
     public static GlobalConfig loadGlobalConfig() throws IOException {
-        List<String> lines;
-        lines = FileUtils.readAllLines(GLOBAL_CONFIG_FILE);
+        List<String> lines = FileUtils.readAllLines(GLOBAL_CONFIG_FILE);
 
         GlobalConfig configModel = new GlobalConfig();
         String[] elements;
@@ -48,8 +49,7 @@ public class ConfigFilesLoader {
     }
 
     public static List<Player> loadPlayers() throws IOException {
-        List<String> lines;
-        lines = FileUtils.readAllLines(PLAYERS_LIST_FILE);
+        List<String> lines = FileUtils.readAllLines(PLAYERS_LIST_FILE);
 
         ArrayList<Player> players = new ArrayList<>();
         String[] elements;
@@ -66,8 +66,7 @@ public class ConfigFilesLoader {
     }
 
     public static List<TimeIntervalModel> loadTimeIntervals() throws IOException {
-        List<String> lines;
-        lines = FileUtils.readAllLines(TIME_INTERVALS_LIST_FILE);
+        List<String> lines = FileUtils.readAllLines(TIME_INTERVALS_LIST_FILE);
 
         List<TimeIntervalModel> timeIntervals = new ArrayList<>();
         final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
@@ -88,10 +87,19 @@ public class ConfigFilesLoader {
         return timeIntervals;
     }
 
+    public static List<String> loadKillVerbs(Language language) throws IOException {
+        String verbsFile = getKillVerbsFileByLanguage(language);
+        List<String> killVerbs = new ArrayList<>();
+        try {
+            killVerbs = FileUtils.readAllNotEmptyLines(verbsFile);
+        }catch (FileNotFoundException ignored){}
+
+        return killVerbs;
+    }
+
     public static Map<WarQuoteActions, String> loadQuotes(Language language) throws IOException {
-        List<String> lines;
         String quotesFile = getQuotesFileByLanguage(language);
-        lines = FileUtils.readAllLines(quotesFile);
+        List<String> lines = FileUtils.readAllLines(quotesFile);
 
         Map<WarQuoteActions, String> quotes = new HashMap<>();
         String[] elements;
@@ -116,7 +124,11 @@ public class ConfigFilesLoader {
         return quotes;
     }
 
+    private static String getKillVerbsFileByLanguage(Language language) {
+        return KILL_VERBS_FILE.replace(LANGUAGE_PARAMETER, language.getCode().toLowerCase());
+    }
+
     private static String getQuotesFileByLanguage(Language language) {
-        return QUOTES_FILE.replace(LANGUAGE_PARAMETER, language.getCode());
+        return QUOTES_FILE.replace(LANGUAGE_PARAMETER, language.getCode().toLowerCase());
     }
 }

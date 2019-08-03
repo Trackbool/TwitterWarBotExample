@@ -3,17 +3,35 @@ package quotes;
 import models.war.Player;
 import quotes.models.WarQuoteActions;
 import quotes.models.WarQuotesConstants;
+import utils.Utils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class WarQuotes {
     private Map<WarQuoteActions, String> quotes;
+    private List<String> killVerbs;
 
     public WarQuotes(Map<WarQuoteActions, String> quotesList) {
+        killVerbs = new ArrayList<>();
+        initDefaultVerbsValues();
+
         quotes = new HashMap<>();
         initDefaultQuotesValues();
         quotesList.forEach((k, v) -> quotes.replace(k, v));
+    }
+
+    public WarQuotes(Map<WarQuoteActions, String> quotesList, List<String> killVerbs) {
+        this(quotesList);
+        if (!killVerbs.isEmpty()) {
+            this.killVerbs = killVerbs;
+        }
+    }
+
+    private void initDefaultVerbsValues() {
+        killVerbs.add("has killed");
     }
 
     private void initDefaultQuotesValues() {
@@ -22,8 +40,9 @@ public class WarQuotes {
         quotes.put(WarQuoteActions.DAY, "Day " + WarQuotesConstants.DAY_NUMBER);
 
         quotes.put(WarQuoteActions.KILL, WarQuotesConstants.KILLER_NAME + " " +
-                "(" + WarQuotesConstants.KILLER_NICKNAME + ") has killed " +
-                "" + WarQuotesConstants.VICTIM_NAME + " " +
+                "(" + WarQuotesConstants.KILLER_NICKNAME + ") " +
+                WarQuotesConstants.KILL_VERB +
+                " " + WarQuotesConstants.VICTIM_NAME + " " +
                 "(" + WarQuotesConstants.VICTIM_NICKNAME + ")");
 
         quotes.put(WarQuoteActions.SUICIDE, WarQuotesConstants.VICTIM_NAME + " " +
@@ -57,6 +76,8 @@ public class WarQuotes {
         String status = replaceParametersWithText(quotes.get(WarQuoteActions.KILL),
                 WarQuotesConstants.KILLER_NAME, killer.getName());
         status = replaceParametersWithText(status, WarQuotesConstants.KILLER_NICKNAME, killer.getNick());
+        status = replaceParametersWithText(status,
+                WarQuotesConstants.KILL_VERB, killVerbs.get(Utils.randomNumber(0, killVerbs.size())));
         status = replaceParametersWithText(status, WarQuotesConstants.VICTIM_NAME, victim.getName());
         status = replaceParametersWithText(status, WarQuotesConstants.VICTIM_NICKNAME, victim.getNick());
 
@@ -89,5 +110,4 @@ public class WarQuotes {
     private static String replaceParametersWithText(String quote, String parameterToReplace, String text) {
         return quote.replace(parameterToReplace, text);
     }
-
 }

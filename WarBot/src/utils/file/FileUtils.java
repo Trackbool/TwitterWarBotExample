@@ -3,11 +3,12 @@ package utils.file;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class FileUtils {
 
-    public static List<String> readAllLines(String fileName) throws IOException {
-        InputStream inputStream = new FileInputStream(fileName);
+    public static List<String> readAllLines(String file) throws IOException {
+        InputStream inputStream = new FileInputStream(file);
         Pair<Reader, String> charsetPair = Chardet.guessCharset(inputStream);
         BufferedReader bufferedReader = new BufferedReader(charsetPair.getKey());
 
@@ -23,6 +24,13 @@ public class FileUtils {
         bufferedReader.close();
 
         return lines;
+    }
+
+    public static List<String> readAllNotEmptyLines(String file) throws IOException {
+        return readAllLines(file)
+                .stream()
+                .filter(value ->  value != null && !value.isEmpty())
+                .collect(Collectors.toList());
     }
 
     public static <T> void serialize(T targetObject, File file) throws IOException {

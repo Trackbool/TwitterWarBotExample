@@ -1,0 +1,1 @@
+You can specify new translation files adding the corresponding folder and quotes.txt file

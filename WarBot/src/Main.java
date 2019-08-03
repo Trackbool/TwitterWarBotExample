@@ -1,11 +1,13 @@
-import models.*;
+import models.Language;
+import models.Notifier;
+import models.TwitterNotifier;
+import models.configuration.GlobalConfigHolder;
 import models.war.Player;
 import models.war.War;
 import quotes.WarQuotes;
 import quotes.models.WarQuoteActions;
 import timer.models.TimeIntervalModel;
 import utils.ConfigFilesLoader;
-import models.configuration.GlobalConfigHolder;
 import utils.Utils;
 import utils.file.FileUtils;
 
@@ -18,7 +20,7 @@ import java.util.Scanner;
 /**
  * @author Adrián Fernández Arnal - @adrianfa5
  */
-public final class Main{
+public final class Main {
     private static final String SAVE_FILE_PATH = "files/save/wargame.sav";
 
     public static void main(String[] args) {
@@ -50,13 +52,14 @@ public final class Main{
 
         List<Player> players = null;
         List<TimeIntervalModel> timeIntervals = null;
+        List<String> killVerbs = null;
         Map<WarQuoteActions, String> quotes = null;
         boolean filesLoadedSuccessfully = false;
         try {
             GlobalConfigHolder.config = ConfigFilesLoader.loadGlobalConfig();
 
-            Language language = new Language(
-                    GlobalConfigHolder.config.getProperty("language"), "");
+            Language language = new Language(GlobalConfigHolder.config.getProperty("language"), "");
+            killVerbs = ConfigFilesLoader.loadKillVerbs(language);
             quotes = ConfigFilesLoader.loadQuotes(language);
 
             timeIntervals = ConfigFilesLoader.loadTimeIntervals();
@@ -83,7 +86,7 @@ public final class Main{
             int updateStatusRate = Integer.parseInt(updateStatusRateInput);
             updateStatusRate = updateStatusRate > 0 ? updateStatusRate : 1;
 
-            WarSimulator simulator = new WarSimulator(war, newGame, new WarQuotes(quotes));
+            WarSimulator simulator = new WarSimulator(war, newGame, new WarQuotes(quotes, killVerbs));
             Notifier twitterNotifier = new TwitterNotifier(war.getAllPlayers());
             simulator.setUpdateStatusRate(updateStatusRate);
             simulator.setTimeIntervals(timeIntervals);
