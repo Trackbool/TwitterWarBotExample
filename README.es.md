@@ -10,7 +10,7 @@ Hay una versión ejecutable compilada para Windows (WarBotCompiled.zip) y el JAR
 * El bot te pedirá que especifiques el intervalo de tiempo entre turnos (en segundos).
 * Puedes especificar intervalos de tiempo en los que el bot actualizará el estado de la guerra, fuera de esos intervalos de tiempo, el bot no twitteará.
 * Puedes especificar un mensaje personalizado para el pie del tweet del bot (o dejarlo vació).
-* [EN DESARROLLO - AÚN NO DISPONIBLE] Puedes especificar frases personalizadas y añadir nuevas traducciones sin cambiar el código directamente.
+* Puedes especificar frases personalizadas y añadir nuevas traducciones sin cambiar el código directamente.
 
 ## Uso
 
