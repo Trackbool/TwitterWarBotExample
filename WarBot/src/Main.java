@@ -1,22 +1,24 @@
-import models.Notifier;
-import models.Player;
-import models.TwitterNotifier;
-import models.War;
+import models.*;
+import models.war.Player;
+import models.war.War;
+import quotes.WarQuotes;
+import quotes.models.WarQuoteActions;
 import timer.models.TimeIntervalModel;
 import utils.ConfigFilesLoader;
-import utils.GlobalConfigHolder;
-import utils.Serializer;
+import models.configuration.GlobalConfigHolder;
 import utils.Utils;
+import utils.file.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 /**
  * @author Adrián Fernández Arnal - @adrianfa5
  */
-public final class Main {
+public final class Main{
     private static final String SAVE_FILE_PATH = "files/save/wargame.sav";
 
     public static void main(String[] args) {
@@ -30,7 +32,7 @@ public final class Main {
             String newGameResponse = sc.nextLine();
             if (!newGameResponse.equalsIgnoreCase("n")) {
                 try {
-                    war = Serializer.deserialize(saveFile);
+                    war = FileUtils.deserialize(saveFile);
                     if (war.getCurrentPlayersCount() > 1) {
                         newGame = false;
                     } else {
@@ -48,9 +50,15 @@ public final class Main {
 
         List<Player> players = null;
         List<TimeIntervalModel> timeIntervals = null;
+        Map<WarQuoteActions, String> quotes = null;
         boolean filesLoadedSuccessfully = false;
         try {
             GlobalConfigHolder.config = ConfigFilesLoader.loadGlobalConfig();
+
+            Language language = new Language(
+                    GlobalConfigHolder.config.getProperty("language"), "");
+            quotes = ConfigFilesLoader.loadQuotes(language);
+
             timeIntervals = ConfigFilesLoader.loadTimeIntervals();
             if (newGame) {
                 players = ConfigFilesLoader.loadPlayers();
@@ -75,7 +83,7 @@ public final class Main {
             int updateStatusRate = Integer.parseInt(updateStatusRateInput);
             updateStatusRate = updateStatusRate > 0 ? updateStatusRate : 1;
 
-            WarSimulator simulator = new WarSimulator(war, newGame);
+            WarSimulator simulator = new WarSimulator(war, newGame, new WarQuotes(quotes));
             Notifier twitterNotifier = new TwitterNotifier(war.getAllPlayers());
             simulator.setUpdateStatusRate(updateStatusRate);
             simulator.setTimeIntervals(timeIntervals);
@@ -84,7 +92,7 @@ public final class Main {
             War serializeWar = war;
             simulator.setOnTurnPerformed(() -> {
                 try {
-                    Serializer.serialize(serializeWar, saveFile);
+                    FileUtils.serialize(serializeWar, saveFile);
                 } catch (IOException ignored) {
                 }
             });

@@ -1,1 +1,2 @@
-footer_message=#Üvaááça
+footer_message=#TwitterWarBot by @adrianfa5
+language=es

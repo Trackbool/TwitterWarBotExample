@@ -1,7 +1,7 @@
 package models;
 
+import models.war.Player;
 import twitter4j.TwitterException;
-import utils.GlobalConfigHolder;
 import utils.ResultsImageGenerator;
 import utils.TwitterManager;
 
@@ -18,11 +18,6 @@ public class TwitterNotifier implements Notifier {
 
     @Override
     public void notify(String message) {
-        String footMessage = GlobalConfigHolder.config.getProperty("footer_message");
-        if (footMessage != null && !footMessage.isEmpty()) {
-            message += "\n" + footMessage;
-        }
-
         System.out.println(message);
         ResultsImageGenerator.generate(players, RESULTS_OUTPUT_PATH);
 

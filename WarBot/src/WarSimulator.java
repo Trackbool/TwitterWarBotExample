@@ -1,9 +1,11 @@
-import models.Kill;
+import models.war.Kill;
 import models.Notifier;
-import models.Player;
-import models.War;
+import models.war.Player;
+import models.war.War;
+import quotes.WarQuotes;
 import timer.TimerTaskExecutor;
 import timer.models.TimeIntervalModel;
+import models.configuration.GlobalConfigHolder;
 import utils.Utils;
 
 import java.util.ArrayList;
@@ -17,29 +19,33 @@ public class WarSimulator {
     private Notifier notifier;
     private boolean newGame;
     private int rateSeconds;
+    private WarQuotes warQuotes;
     private List<TimeIntervalModel> timeIntervals;
 
-    public WarSimulator(War war) {
+    public WarSimulator(War war, WarQuotes warQuotes) {
         this.war = war;
         this.notifier = System.out::println;
         this.newGame = true;
         this.rateSeconds = 0;
+        this.warQuotes = warQuotes;
         this.timeIntervals = new ArrayList<>();
     }
 
-    public WarSimulator(War war, boolean newGame) {
+    public WarSimulator(War war, boolean newGame, WarQuotes warQuotes) {
         this.war = war;
         this.notifier = System.out::println;
         this.newGame = newGame;
         this.rateSeconds = 0;
+        this.warQuotes = warQuotes;
         this.timeIntervals = new ArrayList<>();
     }
 
-    public WarSimulator(War war, boolean newGame, Notifier notifier) {
+    public WarSimulator(War war, boolean newGame, WarQuotes warQuotes, Notifier notifier) {
         this.war = war;
         this.notifier = notifier;
         this.newGame = newGame;
         this.rateSeconds = 0;
+        this.warQuotes = warQuotes;
         this.timeIntervals = new ArrayList<>();
     }
 
@@ -79,13 +85,14 @@ public class WarSimulator {
 
         if (newGame) {
             notifier.notify(getBeginMessage());
+            onTurnPerformed.run();
         }
         executor.start();
     }
 
     private String getBeginMessage() {
-        return "The War '" + war.getName() + "' has begun" +
-                "\nThere are " + war.getAllPlayersCount() + " players" +
+        return warQuotes.getWarBeginStatus(war.getName())
+                + "\n" + warQuotes.getPlayersCountStatus(war.getAllPlayersCount()) +
                 "\n---------------------";
     }
 
@@ -97,9 +104,11 @@ public class WarSimulator {
         Kill kill = getRandomKillerAndVictim();
         war.performKill(kill);
 
-        String message = "Day " + war.getCurrentDay() + "\n" +
+        String message = warQuotes.getDayStatus(war.getCurrentDay()) + "\n" +
                 "\n" + getKillStatus(kill) +
-                "\n" + war.getCurrentPlayersCount() + " player/s remaining\n";
+                "\n" + warQuotes.getPlayersRemainingStatus(war.getCurrentPlayersCount()) + "\n";
+        message = appendCustomFooter(message);
+
         notifier.notify(message);
 
         war.incrementDay();
@@ -115,7 +124,7 @@ public class WarSimulator {
         String winMessage = "";
         Player winner = war.getWinnerIfThereIsOne();
         if (winner != null) {
-            winMessage = "Winner!! " + winner.toString();
+            winMessage = warQuotes.getWinStatus(winner);
         }
         return winMessage;
     }
@@ -139,12 +148,20 @@ public class WarSimulator {
     private String getKillStatus(Kill kill) {
         String status;
         if (!kill.getKiller().equals(kill.getVictim())) {
-            status = kill.getKiller().getName() + " (" + kill.getKiller().getNick() + ") has killed "
-                    + kill.getVictim().getName() + " (" + kill.getVictim().getNick() + ")";
+            status = warQuotes.getKillStatus(kill.getKiller(), kill.getVictim());
         } else {
-            status = kill.getVictim().getName() + " (" + kill.getVictim().getNick() + ") has committed suicide";
+            status = warQuotes.getSuicideStatus(kill.getVictim());
         }
 
         return status;
+    }
+
+    private String appendCustomFooter(String message){
+        String footMessage = GlobalConfigHolder.config.getProperty("footer_message");
+        if (footMessage != null && !footMessage.isEmpty()) {
+            message += "\n" + footMessage;
+        }
+
+        return message;
     }
 }

@@ -1,7 +1,7 @@
 package utils;
 
 import gui.ava.html.image.generator.HtmlImageGenerator;
-import models.Player;
+import models.war.Player;
 
 import java.io.File;
 import java.util.List;
