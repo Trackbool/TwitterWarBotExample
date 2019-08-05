@@ -87,9 +87,9 @@ public class WarSimulator {
     }
 
     private String getBeginMessage() {
-        return warQuotes.getWarBeginStatus(war.getName())
+        return appendCustomFooter(warQuotes.getWarBeginStatus(war.getName())
                 + "\n" + warQuotes.getPlayersCountStatus(war.getAllPlayersCount()) +
-                "\n---------------------";
+                "\n---------------------");
     }
 
     private boolean thereIsOnlyOnePlayer() {
@@ -100,10 +100,10 @@ public class WarSimulator {
         Kill kill = getRandomKillerAndVictim();
         war.performKill(kill);
 
-        String message = warQuotes.getDayStatus(war.getCurrentDay()) + "\n" +
+        String message = appendCustomFooter(warQuotes.getDayStatus(war.getCurrentDay()) + "\n" +
                 "\n" + getKillStatus(kill) +
-                "\n" + warQuotes.getPlayersRemainingStatus(war.getCurrentPlayersCount()) + "\n";
-        message = appendCustomFooter(message);
+                "\n--------" +
+                "\n" + warQuotes.getPlayersRemainingStatus(war.getCurrentPlayersCount()));
 
         notifier.notify(message);
 
@@ -120,7 +120,7 @@ public class WarSimulator {
         String winMessage = "";
         Player winner = war.getWinnerIfThereIsOne();
         if (winner != null) {
-            winMessage = warQuotes.getWinStatus(winner);
+            winMessage = appendCustomFooter(warQuotes.getWinStatus(winner));
         }
         return winMessage;
     }
@@ -155,7 +155,7 @@ public class WarSimulator {
     private String appendCustomFooter(String message){
         String footMessage = GlobalConfigHolder.config.getProperty("footer_message");
         if (footMessage != null && !footMessage.isEmpty()) {
-            message += "\n" + footMessage;
+            message += "\n\n" + footMessage;
         }
 
         return message;

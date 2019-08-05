@@ -28,60 +28,57 @@ public class ConfigFilesLoader {
     private final static String KILL_VERBS_FILE = TRANSLATIONS_PATH + "/kill-verbs.txt";
 
     public static GlobalConfig loadGlobalConfig() throws IOException {
-        List<String> lines = FileUtils.readAllLines(GLOBAL_CONFIG_FILE);
+        List<String> lines = FileUtils.readAllNotEmptyLines(GLOBAL_CONFIG_FILE);
 
         GlobalConfig configModel = new GlobalConfig();
         String[] elements;
-        try {
-            for (String line : lines) {
-                if (line.contains(EQUAL_SYMBOL)) {
-                    elements = line.split(EQUAL_SYMBOL, 2);
-                    configModel.addProperty(elements[0], elements[1]);
-                } else if (!line.isEmpty()) {
-                    throw new IOException("Invalid config file format. Missing '" + EQUAL_SYMBOL + "'.");
-                }
+
+        for (String line : lines) {
+            elements = line.split(EQUAL_SYMBOL, 2);
+            if (elements.length == 2) {
+                configModel.addProperty(elements[0], elements[1]);
+            } else {
+                throw new IOException("Invalid config file format. Missing '" + EQUAL_SYMBOL + "'.");
             }
-        } catch (IndexOutOfBoundsException e) {
-            throw new IOException("Invalid config file format.");
         }
 
         return configModel;
     }
 
     public static List<Player> loadPlayers() throws IOException {
-        List<String> lines = FileUtils.readAllLines(PLAYERS_LIST_FILE);
+        List<String> lines = FileUtils.readAllNotEmptyLines(PLAYERS_LIST_FILE);
 
         ArrayList<Player> players = new ArrayList<>();
         String[] elements;
-        try {
-            for (String line : lines) {
-                elements = line.trim().split(SEMICOLON_SYMBOL);
+
+        for (String line : lines) {
+            elements = line.trim().split(SEMICOLON_SYMBOL, 2);
+            if (elements.length == 2) {
                 players.add(new Player(elements[0].trim(), elements[1]));
+            } else {
+                throw new IOException("Invalid players file format.");
             }
-        } catch (IndexOutOfBoundsException e) {
-            throw new IOException("Invalid players file format.");
         }
 
         return players;
     }
 
     public static List<TimeIntervalModel> loadTimeIntervals() throws IOException {
-        List<String> lines = FileUtils.readAllLines(TIME_INTERVALS_LIST_FILE);
+        List<String> lines = FileUtils.readAllNotEmptyLines(TIME_INTERVALS_LIST_FILE);
 
         List<TimeIntervalModel> timeIntervals = new ArrayList<>();
         final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
         String[] elements;
-        try {
-            for (String line : lines) {
-                if (line != null && !line.isEmpty()) {
-                    elements = line.trim().split(SEMICOLON_SYMBOL);
-                    LocalTime begin = LocalTime.parse(elements[0].trim(), FORMATTER);
-                    LocalTime end = LocalTime.parse(elements[1].trim(), FORMATTER);
-                    timeIntervals.add(new TimeIntervalModel(begin, end));
-                }
+
+        for (String line : lines) {
+            elements = line.trim().split(SEMICOLON_SYMBOL);
+            if (elements.length == 2) {
+                LocalTime begin = LocalTime.parse(elements[0].trim(), FORMATTER);
+                LocalTime end = LocalTime.parse(elements[1].trim(), FORMATTER);
+                timeIntervals.add(new TimeIntervalModel(begin, end));
+            } else {
+                throw new IOException("Invalid time intervals file format.");
             }
-        } catch (IndexOutOfBoundsException e) {
-            throw new IOException("Invalid time intervals file format.");
         }
 
         return timeIntervals;
@@ -92,28 +89,27 @@ public class ConfigFilesLoader {
         List<String> killVerbs = new ArrayList<>();
         try {
             killVerbs = FileUtils.readAllNotEmptyLines(verbsFile);
-        }catch (FileNotFoundException ignored){}
+        } catch (FileNotFoundException ignored) {
+        }
 
         return killVerbs;
     }
 
     public static Map<WarQuoteActions, String> loadQuotes(Language language) throws IOException {
         String quotesFile = getQuotesFileByLanguage(language);
-        List<String> lines = FileUtils.readAllLines(quotesFile);
+        List<String> lines = FileUtils.readAllNotEmptyLines(quotesFile);
 
         Map<WarQuoteActions, String> quotes = new HashMap<>();
         String[] elements;
         try {
             for (String line : lines) {
-                if (line != null && !line.isEmpty()) {
-                    elements = line.trim().split(EQUAL_SYMBOL);
-                    if (elements.length == 2) {
-                        WarQuoteActions quoteStatus = WarQuoteActions.valueOf(elements[0].trim());
-                        String quote = elements[1];
-                        quotes.put(quoteStatus, quote);
-                    } else {
-                        throw new IOException("No quote identifier");
-                    }
+                elements = line.trim().split(EQUAL_SYMBOL, 2);
+                if (elements.length == 2) {
+                    WarQuoteActions quoteStatus = WarQuoteActions.valueOf(elements[0].trim());
+                    String quote = elements[1];
+                    quotes.put(quoteStatus, quote);
+                } else {
+                    throw new IOException("No quote identifier");
                 }
             }
         } catch (IOException | IllegalArgumentException e) {
